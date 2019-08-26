@@ -47,7 +47,7 @@ func decodeRuneLS(p []byte) (r rune, size int) {
 
 	{
 		r2, size2 := utf8.DecodeRune(p[size:])
-		if utf8.RuneError == r {
+		if utf8.RuneError == r2 {
 			return utf8.RuneError, size+size2
 		}
 
