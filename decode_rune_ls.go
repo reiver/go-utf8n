@@ -4,7 +4,7 @@ import (
 	"unicode/utf8"
 )
 
-// decodeRuneLS only does the LS (line separator) transformations/
+// decodeRuneLS only does the LS (line separator) transformations.
 //
 // (The PS (paragraph separator) transformations are done by decodeRunePS
 // which calls this function.)
