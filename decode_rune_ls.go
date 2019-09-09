@@ -22,7 +22,7 @@ func decodeRuneLS(p []byte) (r rune, size int) {
 
 	r, size = utf8.DecodeRune(p)
 	if utf8.RuneError == r {
-		return utf8.RuneError, size
+		return RuneError, size
 	}
 
 	switch r {
@@ -48,7 +48,7 @@ func decodeRuneLS(p []byte) (r rune, size int) {
 	{
 		r2, size2 := utf8.DecodeRune(p[size:])
 		if utf8.RuneError == r2 {
-			return utf8.RuneError, size+size2
+			return RuneError, size+size2
 		}
 
 		if CR == r && LF == r2 {
