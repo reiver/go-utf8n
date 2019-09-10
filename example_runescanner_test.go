@@ -25,86 +25,65 @@ dATE
 
 	var runeScanner io.RuneScanner = utf8n.RuneScanner(readSeeker)
 
-	var r rune
-	var err error
+	var buffer strings.Builder
 
-	for i:=0; i<22; i++ {
-		r, _, err = runeScanner.ReadRune()
+	for {
+		r, _, err := runeScanner.ReadRune()
+		if nil != err && io.EOF == err {
+			break
+		}
 		if nil != err {
-			fmt.Printf("ERROR: could not read another rune: %s", err)
+			fmt.Printf("ERROR: problem getting next rune: %s\n", err)
 			return
 		}
 
-		fmt.Printf("%q\n", string(r))
-	}
+		switch r {
+		case '\t':
+			fmt.Printf("%q\n", buffer.String())
+			buffer.Reset()
 
-	fmt.Printf("=====])> UNREAD! %q\n", string(r))
+			fmt.Printf("%q (tab)\n", string(r))
 
-	err = runeScanner.UnreadRune()
-	if nil != err {
-		fmt.Printf("ERROR: could not unread rune: %s", err)
-		return
-	}
+		case ' ':
+			fmt.Printf("%q\n", buffer.String())
+			buffer.Reset()
 
-	for i:=0; i<27; i++ {
-		r, _, err = runeScanner.ReadRune()
-		if nil != err {
-			fmt.Printf("ERROR: could not read another rune: %s", err)
-			return
+			fmt.Printf("%q (space)\n", string(r))
+
+		case '\u2028':
+			fmt.Printf("%q\n", buffer.String())
+			buffer.Reset()
+
+			fmt.Printf("%q (line separator)\n", string(r))
+
+		case '\u2029':
+			fmt.Printf("%q\n", buffer.String())
+			buffer.Reset()
+
+			fmt.Printf("%q (paragraph separator)\n", string(r))
+
+		default:
+			buffer.WriteRune(r)
 		}
-
-		fmt.Printf("%q\n", string(r))
+	}
+	if 0 < buffer.Len() {
+		fmt.Printf("%q\n", buffer.String())
+		buffer.Reset()
 	}
 
 // Output:
-// "H"
-// "e"
-// "l"
-// "l"
-// "o"
-// " "
-// "w"
-// "o"
-// "r"
-// "l"
-// "d"
-// "!"
-// "\u2029"
-// "K"
-// "h"
-// "o"
-// "d"
-// "a"
-// "f"
-// "e"
-// "z"
-// "."
-// =====])> UNREAD! "."
-// "."
-// "\u2029"
-// "a"
-// "p"
-// "p"
-// "l"
-// "e"
-// "\u2028"
-// "B"
-// "A"
-// "N"
-// "A"
-// "N"
-// "A"
-// "\u2028"
-// "C"
-// "h"
-// "e"
-// "r"
-// "r"
-// "y"
-// "\u2028"
-// "d"
-// "A"
-// "T"
-// "E"
-// "\u2028"
+// "Hello"
+// " " (space)
+// "world!"
+// "\u2029" (paragraph separator)
+// "Khodafez."
+// "\u2029" (paragraph separator)
+// "apple"
+// "\u2028" (line separator)
+// "BANANA"
+// "\u2028" (line separator)
+// "Cherry"
+// "\u2028" (line separator)
+// "dATE"
+// "\u2028" (line separator)
 }
