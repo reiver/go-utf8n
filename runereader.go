@@ -6,17 +6,32 @@ import (
 	"unicode/utf8"
 )
 
-func RuneReader(readSeeker io.ReadSeeker) io.RuneReader {
-	return internalRuneReader {
+func RuneScanner(readSeeker io.ReadSeeker) io.RuneScanner {
+	return &internalRuneScanner {
 		readSeeker:readSeeker,
 	}
 }
 
-type internalRuneReader struct {
+type internalRuneScanner struct {
 	readSeeker io.ReadSeeker
+	unread bool
+	previous rune
 }
 
-func (receiver internalRuneReader) ReadRune() (r rune, size int, err error) {
+func (receiver *internalRuneScanner) yield(value rune) (r rune, size int, err error) {
+	receiver.previous = value
+	return value, utf8.RuneLen(value), nil
+}
+
+func (receiver *internalRuneScanner) ReadRune() (r rune, size int, err error) {
+
+	if receiver.unread {
+		receiver.unread = false
+
+		r = receiver.previous
+
+		return r, utf8.RuneLen(r), nil
+	}
 
 	var readSeeker io.ReadSeeker = receiver.readSeeker
 	if nil == readSeeker {
@@ -51,5 +66,10 @@ func (receiver internalRuneReader) ReadRune() (r rune, size int, err error) {
 		}
 	}
 
-	return r, utf8.RuneLen(r), nil
+	return receiver.yield(r)
+}
+
+func (receiver *internalRuneScanner) UnreadRune() error {
+	receiver.unread = true
+	return nil
 }

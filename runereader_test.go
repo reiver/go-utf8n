@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestRuneReader(t *testing.T) {
+func TestRuneScanner(t *testing.T) {
 
 	const hbegin = "\x1b[93;41m"
 	const hend   = "\x1b[0m"
@@ -208,7 +208,7 @@ func TestRuneReader(t *testing.T) {
 		{
 			var readSeeker io.ReadSeeker = strings.NewReader(test.Text)
 
-			var runeReader io.RuneReader = utf8n.RuneReader(readSeeker)
+			var runeReader io.RuneScanner = utf8n.RuneScanner(readSeeker)
 
 			var dst strings.Builder
 
